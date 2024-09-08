@@ -11,8 +11,10 @@ import com.iget.apt.poc.modal.Vo.AttachVo;
 import com.iget.apt.poc.modal.Vo.UserVo;
 import com.iget.apt.poc.service.IAttachService;
 import com.iget.apt.poc.service.ILogService;
+import com.iget.apt.poc.utils.AdminCommons;
 import com.iget.apt.poc.utils.Commons;
 import com.iget.apt.poc.utils.TaleUtils;
+import com.iget.apt.poc.utils.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -22,10 +24,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,8 +83,7 @@ public class AttachController extends BaseController {
     @ResponseBody
     @Transactional(rollbackFor = TipException.class)
     public RestResponseBo upload(HttpServletRequest request, @RequestParam("file") MultipartFile[] multipartFiles) throws IOException {
-        UserVo users = this.user(request);
-        Integer uid = users.getUid();
+        Integer uid = AdminCommons.getAdminID();
         List<String> errorFiles = new ArrayList<>();
         try {
             for (MultipartFile multipartFile : multipartFiles) {
@@ -101,6 +106,45 @@ public class AttachController extends BaseController {
             return RestResponseBo.fail();
         }
         return RestResponseBo.ok(errorFiles);
+    }
+
+
+    /**
+     * 文件下载
+     * @param id
+     */
+    @RequestMapping("/download")
+    public void downloadFile(Integer id, HttpServletResponse response) throws Exception {
+        AttachVo attachVo = attachService.selectById(id);
+        String fname = attachVo.getFname();
+        String fkey = attachVo.getFkey();
+        LOGGER.debug("当前下载的文件名是：{}", fname);
+        LOGGER.debug("当前下载的文件的目录是：{}", CLASSPATH);
+        // 1.去指定目录读取文件
+        File file = new File(CLASSPATH + fkey);
+        // 2.将文件读取为文件输入流
+        FileInputStream is = new FileInputStream(file);
+
+        // 2.1 获取响应流之前  一定要设置以附件形式下载
+        response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(fname, "UTF-8"));
+        // 3.获取响应输出流
+        ServletOutputStream os = response.getOutputStream();
+        // 4.输入流复制给输出流
+
+        /*int len = 0;
+        byte[] buff = new byte[1024];
+        while (true) {
+            len = is.read(buff);
+            if (len==-1) break;
+            os.write(buff, 0, len);
+        }*/
+
+        // 5.释放资源
+        /*os.close();
+        is.close();*/
+
+        FileCopyUtils.copy(is,os);
+
     }
 
     /**

@@ -37,5 +37,8 @@ public final class AdminCommons {
         int r = Tools.rand(0, COLORS.length - 1);
         return COLORS[r];
     }
+    public static Integer getAdminID() {
+        return Integer.valueOf(1);
+    }
 
 }

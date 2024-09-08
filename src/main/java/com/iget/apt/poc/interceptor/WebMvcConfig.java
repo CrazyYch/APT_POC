@@ -3,9 +3,7 @@ package com.iget.apt.poc.interceptor;
 
 import com.iget.apt.poc.utils.TaleUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -30,5 +28,10 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/upload/**").addResourceLocations("file:"+ TaleUtils.getUplodFilePath()+"upload/");
         super.addResourceHandlers(registry);
+    }
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/admin/index");
     }
 }
