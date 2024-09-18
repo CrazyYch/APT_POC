@@ -5,7 +5,7 @@
 *.log
 *.o
 temp/
-target
+target/
 
 # BlueJ files
 *.ctxt
