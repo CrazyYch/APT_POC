@@ -162,7 +162,7 @@ public class AttachController extends BaseController {
             if (null == attach) return RestResponseBo.fail("不存在该附件");
             attachService.deleteById(id);
             new File(CLASSPATH+attach.getFkey()).delete();
-            logService.insertLog(LogActions.DEL_ARTICLE.getAction(), attach.getFkey(), request.getRemoteAddr(), this.getUid(request));
+          //  logService.insertLog(LogActions.DEL_ARTICLE.getAction(), attach.getFkey(), request.getRemoteAddr(), this.getUid(request));
         } catch (Exception e) {
             String msg = "附件删除失败";
             if (e instanceof TipException) msg = e.getMessage();
